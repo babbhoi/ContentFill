@@ -1,0 +1,7 @@
+{
+  "name": "Content Fill",
+  "id": "992013174696141381",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html"
+}

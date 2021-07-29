@@ -26,6 +26,7 @@
     <select type="text"  id="apiType">
         <option >Test</option>
       <option >Feed</option>
+      <option >FeedCard</option>
       <option >Chatroom</option>
       <option >Bucket</option>
       <option >Topics/Tags</option>
@@ -65,9 +66,11 @@
       case "Feed":fetchFeedData(optionUpdate);
         break;
       case "Test":fetchTest(optionUpdate);
+        break;
+      case "FeedCard":fetchFeedCard(optionUpdate);
 
     }
-    document.getElementById("apiStats").innerHTML=api_+" API Data loaded successfully!"
+   
     //optionUpdate();
     //fetchData(optionUpdate);
     //fetchFeedData(optionUpdate);
@@ -174,7 +177,7 @@ async function optionUpdate(){
 }
 
 async function fetchData(cbFunction){
-  var url = "https://apis.sharechat.com/tag-chat-service/v2.2.0/tagChat?entityType=user&userId=224852496&sections=POPULAR&limit=6&scrollType=list&referrer=MyChat";
+  var url = "https://apis.sharechat.com/tag-chat-service/v2.2.0/tagChat?entityType=user&userId=45779194&sections=POPULAR&limit=6&scrollType=list&referrer=MyChat";
 
   var xhr = new XMLHttpRequest();
   xhr.open("GET", url);
@@ -188,7 +191,9 @@ async function fetchData(cbFunction){
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
       var topicss=[]
+      console.log(xhr.response);
       for(const topic of xhr.response.sectionList){
+        if(topic.topics)
         topicss=[...topicss,...topic.topics]
       }
       var filterData=[]
@@ -199,13 +204,58 @@ async function fetchData(cbFunction){
                           audioMember:t.currentAudioMemberCount,
                           ownerImage:t.ownerImageUrl,
                           status:t.status,
-                          name:t.name
+                          name:t.name,
+                          "online+text":t.subtitleOne.text,
                         })
       }
         //console.log(xhr.status);
         console.log(topicss[0]);
         data=filterData;
         //return topicss[0]
+        //statusUpdate(data.length)
+        fetchData1(cbFunction)
+    }};
+
+  await xhr.send();
+}
+
+async function fetchData1(cbFunction){
+  var url = "https://apis.sharechat.com/tag-chat-service/v2.2.0/tagChat?entityType=user&userId=45779194&sections=POPULAR&limit=6&scrollType=list&referrer=MyChat";
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url);
+  xhr.responseType = 'json';
+  
+  xhr.setRequestHeader("X-SHARECHAT-USERID", "45779194");
+  xhr.setRequestHeader("X-SHARECHAT-SECRET", "29a5692154b6f1bf12f9");
+  xhr.setRequestHeader("APP-VERSION", "5094");
+  xhr.setRequestHeader("DEVICE-ID", "cd9dbdb70bcf4dc9");
+  
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      var topicss=[]
+      console.log(xhr.response);
+      for(const topic of xhr.response.sectionList){
+        if(topic.topics)
+        topicss=[...topicss,...topic.topics]
+      }
+      var filterData=[]
+      for(const t of topicss){
+        filterData.push({
+                          online:t.currentlyOnline,
+                          groupCover:t.bgImage,
+                          audioMember:t.currentAudioMemberCount,
+                          ownerImage:t.ownerImageUrl,
+                          status:t.status,
+                          name:t.name,
+                          "online+text":t.subtitleOne.text,
+                        })
+      }
+        //console.log(xhr.status);
+        console.log(topicss[0]);
+        data=[...data,...filterData];
+        //return topicss[0]
+        statusUpdate(data.length)
         cbFunction()
     }};
 
@@ -253,13 +303,38 @@ xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         
         data=topicss;
         //return topicss[0]
+        statusUpdate(data.length)
         cbFunction()
     }};
     var data1 = '${"appVersion":5094,"bn":"broker1","client":"android","deviceId":"cd9dbdb70bcf4dc9","message":{"keyword":"srk","language":"Hindi","sessionId":"45779194_1627362765735"},"passCode":"29a5692154b6f1bf12f9","resTopic":"response/user_45779194_29a5692154b6f1bf12f9","userId":"45779194"}';
   await xhr.send(data1);
 }
 
-async function fetchTrendigTags(cbFunction){
+async function fetchFeedCard(cbFunction){
+  var url = "https://apis.sharechat.com/group-tag-service/v1.0.0/public/feed/tagTrending/9665029?groupKarmaVariant=control&language=Hindi&topCommentVariant=variant-2&adsShown=0&firstFeed=true";
+
+
+var xhr = new XMLHttpRequest();
+xhr.open("GET", url);
+xhr.responseType='json';
+
+xhr.setRequestHeader("X-SHARECHAT-USERID", "45779194");
+xhr.setRequestHeader("X-SHARECHAT-SECRET", "29a5692154b6f1bf12f9");
+xhr.setRequestHeader("APP-VERSION", "5094");
+xhr.setRequestHeader("DEVICE-ID", "cd9dbdb70bcf4dc9");
+xhr.setRequestHeader("LOCALE-LANGUAGE", "Hindi");
+xhr.setRequestHeader("LOCALE-SKIN", "DEFAULT");
+xhr.setRequestHeader("LOCALE-SKIN-LANGUAGE", "Hindi");
+xhr.setRequestHeader("SESSION-ID", "45779194_98070e40-4149-4731-94d0-0752ad5282d5");
+
+
+xhr.onreadystatechange = function () {
+   if (xhr.readyState === 4) {
+      console.log(xhr.status);
+      console.log(xhr.response);
+   }};
+
+xhr.send();
 
 }
 
@@ -279,11 +354,12 @@ async function fetchEndlessTopics(cbFunction){
   xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
           var bucket=[]
-
+          console.log(xhr.response);
           for(const b of xhr.response.elements){
             bucket.push({image:b.image,title:b.title})
           }
           data=bucket;
+          statusUpdate(data.length)
           cbFunction()
       }};
 
@@ -312,6 +388,7 @@ async function fetchBucket(cbFunction){
             bucket.push({image:b.image,title:b.title})
           }
           data=bucket;
+          statusUpdate(data.length)
           cbFunction()
       }};
 
@@ -323,6 +400,7 @@ async function fetchTest(cbFunction){
 
   var xhr = new XMLHttpRequest();
   xhr.open("POST", url);
+  xhr.responseType='json'
 
   
   xhr.setRequestHeader("X-SHARECHAT-USERID", "45779194");
@@ -333,17 +411,17 @@ async function fetchTest(cbFunction){
   xhr.setRequestHeader("LOCALE-SKIN", "DEFAULT");
   xhr.setRequestHeader("LOCALE-SKIN-LANGUAGE", "Hindi");
   xhr.setRequestHeader("SESSION-ID", "45779194_f0843c1c-46fa-4714-a793-37c8c8fc03d5");
-  xhr.setRequestHeader("Content-Type", "application/json");
+       xhr.setRequestHeader("Content-Type", "application/json");
+  
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
         console.log(xhr.status);
-        console.log(xhr.responseText);
+        console.log(xhr.response);
     }};
 
-  var data = '${"appVersion":5094,"bn":"broker1","client":"android","deviceId":"cd9dbdb70bcf4dc9","message":{"keyword":"srk","language":"Hindi","sessionId":"45779194_1627362765735"},"passCode":"29a5692154b6f1bf12f9","resTopic":"response/user_45779194_29a5692154b6f1bf12f9","userId":"45779194"}';
-
-  xhr.send(data);
+  var data1 = '${"appVersion":5094,"bn":"broker1","client":"android","deviceId":"cd9dbdb70bcf4dc9","message":{"keyword":"srk","language":"Hindi","sessionId":"45779194_1627362765735"},"passCode":"29a5692154b6f1bf12f9","resTopic":"response/user_45779194_29a5692154b6f1bf12f9","userId":"45779194"}';
+  xhr.send(data1);
 
 }
 
@@ -362,6 +440,10 @@ function layerIcon(type){
         "<circle cx=\"10.5\" cy=\"4.5\" r=\"1.5\" fill=\"white\"/>"+
         "</svg>";
   }
+}
+
+function statusUpdate(count){
+  document.getElementById("apiStats").innerHTML=count+" data sets loaded successfully!"
 }
 
 async function encode(canvas, ctx, imageData) {

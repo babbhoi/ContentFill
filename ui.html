@@ -47,7 +47,7 @@
     <button id="clone" class="px-16">Clone</button>
 </div>
 
-<div class="flex col" id="container">
+<div class="flex col mb-56" id="container">
  
 </div>
 
@@ -330,8 +330,37 @@ xhr.setRequestHeader("SESSION-ID", "45779194_98070e40-4149-4731-94d0-0752ad5282d
 
 xhr.onreadystatechange = function () {
    if (xhr.readyState === 4) {
-      console.log(xhr.status);
-      console.log(xhr.response);
+    var bucket=[]
+          //console.log(xhr.response);
+          for(const b of xhr.response.posts){
+            var lk;
+            if(b.lc>999)lk=(b.lc/1000)+'K';
+            else lk=b.lc;
+            var media;
+            if(b.t=='image')media=b.g
+            else 
+            if(b.t=='video')media=b.secondaryThumbs[0]
+            if(b.t=='image' || b.t=='video')
+            bucket.push({
+                          userName:b.n,
+                          userPic:b.y,
+                          userStatus:b.ath.s,
+                          post:media,
+                          postThumb:b.b,
+                          location:b.ath.lc,
+                          caption:b.c,
+                          views:b.l,
+                          likes:lk,
+                          shares:b.s,
+                          fav:b.favouriteCount
+
+
+
+                        })
+          }
+          data=bucket;
+          statusUpdate(data.length)
+          cbFunction()
    }};
 
 xhr.send();
@@ -354,7 +383,7 @@ async function fetchEndlessTopics(cbFunction){
   xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
           var bucket=[]
-          console.log(xhr.response);
+          //console.log(xhr.response);
           for(const b of xhr.response.elements){
             bucket.push({image:b.image,title:b.title})
           }
@@ -659,6 +688,9 @@ async function encode(canvas, ctx, imageData) {
   }
   .mb-8{
     margin-bottom: 8px;
+  }
+  .mb-56{
+    margin-bottom: 56px;
   }
   .ml-8{
     margin-left: 8px;

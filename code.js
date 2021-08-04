@@ -62,7 +62,7 @@ figma.ui.onmessage = (msg) => __awaiter(this, void 0, void 0, function* () {
                 }
                 //clone 
                 const nodeStore = figma.currentPage.selection[0].clone();
-                figma.currentPage.selection[0].x += figma.currentPage.selection[0].width + 24;
+                figma.currentPage.selection[0].x += nodeStore.width + 24;
                 array_inst.push(nodeStore);
                 // update image 
                 for (const d of msg.selop) {

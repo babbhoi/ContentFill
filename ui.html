@@ -24,8 +24,7 @@
 </div> -->
 <div class="flex row px-8 mt-32">
     <select type="text"  id="apiType">
-        <option >Test</option>
-      <option >Feed</option>
+      
       <option >FeedCard</option>
       <option >Chatroom</option>
       <option >Bucket</option>
@@ -61,13 +60,11 @@
         break;
       case "Bucket":fetchBucket(optionUpdate);
         break;
-      case "Topics/Tags":fetchEndlessTopics(optionUpdate);
-        break;
-      case "Feed":fetchFeedData(optionUpdate);
+      case "Topics/Tags":fetchEndlessTopics(optionUpdate);  
         break;
       case "Test":fetchTest(optionUpdate);
         break;
-      case "FeedCard":fetchFeedCard(optionUpdate);
+      case "FeedCard":preFeedFetch(optionUpdate);
 
     }
    
@@ -79,6 +76,7 @@
 
   }
   var data;
+  var tagList;
   const layers=[];
   document.getElementById('clone').onclick = () => {
     //const gr = document.getElementById('gr').checked;
@@ -367,6 +365,8 @@ xhr.send();
 
 }
 
+
+
 async function fetchEndlessTopics(cbFunction){
   var url = "https://apis.sharechat.com/explore-service/v1.0.0/explore/endless-topic-list/Hindi?limit=20&referrer=native";
 
@@ -395,6 +395,104 @@ async function fetchEndlessTopics(cbFunction){
     xhr.send();
 }
 
+async function preFeedFetch(cbFunction){
+  var url = "https://apis.sharechat.com/explore-service/v2.0.0/explore?lang=Hindi&groupTag=true&addNVBucket=false";
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url);
+  xhr.responseType = 'json';
+
+  xhr.setRequestHeader("X-SHARECHAT-USERID", "45779194");
+  xhr.setRequestHeader("X-SHARECHAT-SECRET", "29a5692154b6f1bf12f9");
+  xhr.setRequestHeader("APP-VERSION", "5094");
+  xhr.setRequestHeader("DEVICE-ID", "cd9dbdb70bcf4dc9");
+  xhr.setRequestHeader("SESSION-ID", "656295619_c7105e3a-a3d3-4b76-83ad-0b8b93389a75");
+
+  xhr.onreadystatechange = async function () {
+      if (xhr.readyState === 4) {
+          var bucket=[]
+          //console.log(xhr.response);
+          data=[]; 
+          var counter=0;
+         
+          for(const b of xhr.response.bucketsAndTags){
+            if(counter<5){
+              //bucket.push(b.tags[0].tagId)
+              await fetchTagFeed(b.tags[0].tagId,cbFunction)
+              counter++;
+            }
+            else break;
+          }
+          //tagList=bucket;
+          //statusUpdate(data.length)
+          //cbFunction()
+          //console.log(data);
+      }};
+
+    xhr.send();
+}
+
+async function fetchTagFeed(tagId,cbFunction){
+  var url = "https://apis.sharechat.com/group-tag-service/v1.0.0/public/feed/tagTrending/"+tagId+"?groupKarmaVariant=control&language=Hindi&topCommentVariant=variant-2&adsShown=0&firstFeed=true";
+
+  
+var xhr = new XMLHttpRequest();
+xhr.open("GET", url);
+xhr.responseType='json';
+
+xhr.setRequestHeader("X-SHARECHAT-USERID", "45779194");
+xhr.setRequestHeader("X-SHARECHAT-SECRET", "29a5692154b6f1bf12f9");
+xhr.setRequestHeader("APP-VERSION", "5094");
+xhr.setRequestHeader("DEVICE-ID", "cd9dbdb70bcf4dc9");
+xhr.setRequestHeader("LOCALE-LANGUAGE", "Hindi");
+xhr.setRequestHeader("LOCALE-SKIN", "DEFAULT");
+xhr.setRequestHeader("LOCALE-SKIN-LANGUAGE", "Hindi");
+xhr.setRequestHeader("SESSION-ID", "45779194_98070e40-4149-4731-94d0-0752ad5282d5");
+
+
+xhr.onreadystatechange = function () {
+   if (xhr.readyState === 4) {
+    var bucket=[]
+    var counter=0;
+          //console.log(xhr.response);
+          for(const b of xhr.response.posts){
+            if(counter>4)break;
+            counter++;
+            var lk;
+            if(b.lc>999)lk=(b.lc/1000)+'K';
+            else lk=b.lc;
+            var media;
+            if(b.t=='image')media=b.g
+            else 
+            if(b.t=='video')media=b.secondaryThumbs[0]
+            if(b.t=='image' || b.t=='video')
+            bucket.push({
+                          userName:b.n,
+                          userPic:b.y,
+                          userStatus:b.ath.s,
+                          post:media,
+                          postThumb:b.b,
+                          location:b.ath.lc,
+                          caption:b.c,
+                          views:b.l,
+                          likes:lk,
+                          shares:b.s,
+                          fav:b.favouriteCount
+
+
+
+                        })
+          }
+          data=[...data,...bucket];
+          //console.log(data);
+          statusUpdate(data.length)
+          cbFunction()
+          
+   }};
+
+xhr.send();
+
+}
 
 async function fetchBucket(cbFunction){
   var url = "https://apis.sharechat.com/explore-service/v1.0.0/explore/endless-topics-bucket-list/Hindi?limit=20&skinLanguage=Hindi&englishSkin=0&referrer=native_androidV3";

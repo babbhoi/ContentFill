@@ -71,7 +71,7 @@ figma.ui.onmessage = async(msg) => {
           if(node){
             const id=getCorId(figma.currentPage.selection[0],nodeStore,d.id)
             if(d.type=='img')
-              {console.log('image update handle');
+              {//console.log('image update handle');
                 updateFill(nodeStore.id,id,c[d.value]);
             }            
           }
@@ -105,7 +105,7 @@ figma.ui.onmessage = async(msg) => {
   }
 
   if(msg.type==='newApiFetched'){
-    console.log("update by api change")
+    //console.log("update by api change")
     handleselection()
   }
 
@@ -116,7 +116,7 @@ figma.ui.onmessage = async(msg) => {
 figma.on('selectionchange', handleselection);
 
 function handleselection(){
-  console.log("update by api change")
+  //console.log("update by api change")
   if(figma.currentPage.selection.length==1){
     //Extracting all required layers
     const selected = []

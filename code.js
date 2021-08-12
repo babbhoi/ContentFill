@@ -69,8 +69,7 @@ figma.ui.onmessage = (msg) => __awaiter(this, void 0, void 0, function* () {
                     const node = getNode(figma.currentPage.selection[0], d.id);
                     if (node) {
                         const id = getCorId(figma.currentPage.selection[0], nodeStore, d.id);
-                        if (d.type == 'img') {
-                            console.log('image update handle');
+                        if (d.type == 'img') { //console.log('image update handle');
                             updateFill(nodeStore.id, id, c[d.value]);
                         }
                     }
@@ -101,7 +100,7 @@ figma.ui.onmessage = (msg) => __awaiter(this, void 0, void 0, function* () {
         node.fills = [...newfills];
     }
     if (msg.type === 'newApiFetched') {
-        console.log("update by api change");
+        //console.log("update by api change")
         handleselection();
     }
     // Make sure to close the plugin when you're done. Otherwise the plugin will
@@ -110,7 +109,7 @@ figma.ui.onmessage = (msg) => __awaiter(this, void 0, void 0, function* () {
 });
 figma.on('selectionchange', handleselection);
 function handleselection() {
-    console.log("update by api change");
+    //console.log("update by api change")
     if (figma.currentPage.selection.length == 1) {
         //Extracting all required layers
         const selected = [];
